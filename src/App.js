@@ -4,37 +4,42 @@ import { calculateWinner } from './helpers';
 import './styles/root.scss';
 
 const App = () => {
-  // board is array contains X and O
-  const [board, setBoard] = useState(Array(9).fill(null));
-  // isXNext is boolean contain the turn for oppnent
-  const [isXNext, setIsXNext] = useState(false);
+  // History is array to store square values with next move
+  const [history, setHistory] = useState([
+    { board: Array(9).fill(null), isXNext: true },
+  ]);
 
-  const winner = calculateWinner(board);
+  // Set current move to current index of history
+  const [currentMove, setCurrentMove] = useState(0);
+  const current = history[currentMove];
 
+  // Check What Message to Dislay Above Board
+  const winner = calculateWinner(current.board);
   const message = winner
     ? `Winner is ${winner}`
-    : `This if turn for ${isXNext ? 'X' : 'O'}`;
+    : `This if turn for ${current.isXNext ? 'X' : 'O'}`;
 
+  // Handle every click on square boxes
   const handleSquareClick = position => {
-    if (board[position] || winner) {
-      return;
-    }
+    if (current.board[position] || winner) return;
 
-    setBoard(prev => {
-      return prev.map((square, pos) => {
-        if (pos === position) return isXNext ? 'X' : 'O';
+    setHistory(prev => {
+      const lastHist = prev[prev.length - 1];
+      const newBoard = lastHist.board.map((square, pos) => {
+        // Insert new elemnt in board at clicked position
+        if (pos === position) return lastHist.isXNext ? 'X' : 'O';
         return square;
       });
+      return prev.concat({ board: newBoard, isXNext: !lastHist.isXNext });
     });
-
-    setIsXNext(prev => !prev);
+    setCurrentMove(prev => prev + 1);
   };
 
   return (
     <div className="app">
       <h1>Tic Tac Toe</h1>
       <h2>{message}</h2>
-      <Board board={board} handleSquareClick={handleSquareClick} />
+      <Board board={current.board} handleSquareClick={handleSquareClick} />
     </div>
   );
 };
