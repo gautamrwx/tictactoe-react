@@ -16,7 +16,7 @@ const App = () => {
   const current = history[currentMove];
 
   // Check What Message to Dislay Above Board
-  const winner = calculateWinner(current.board);
+  const { winner, winnigSquares } = calculateWinner(current.board);
 
   // Handle every click on square boxes
   const handleSquareClick = position => {
@@ -38,11 +38,23 @@ const App = () => {
     setCurrentMove(move);
   };
 
+  const resetGame = () => {
+    setHistory([{ board: Array(9).fill(null), isXNext: true }]);
+    setCurrentMove(0);
+  };
+
   return (
     <div className="app">
       <h1>Tic Tac Toe</h1>
       <StatusMessage winner={winner} current={current} />
-      <Board board={current.board} handleSquareClick={handleSquareClick} />
+      <Board
+        board={current.board}
+        handleSquareClick={handleSquareClick}
+        winningSquares={winnigSquares}
+      />
+      <button type="button" onClick={resetGame}>
+        Start new Game
+      </button>
       <History history={history} moveTo={moveTo} currentMove={currentMove} />
     </div>
   );
